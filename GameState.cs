@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Ink;
+using System.IO;
 
 namespace Tetris
 {
     public class GameState
     {
         private Block currentBlock;
+        
 
         public Block CurrentBlock
         {
@@ -40,14 +37,34 @@ namespace Tetris
         public Block HeldBlock { get; private set; }
         public bool CanHold { get; private set; }   
 
+
+        public int HighScore { get; private set; }
+
+        public string Player { get; private set; }
+
+      
+
         public GameState()
         {
             GameGrid = new GameGrid(22, 10);
             BlockQueue= new BlockQueue();
             currentBlock = BlockQueue.GetAndUpdate();
             CanHold = true;
+            HighScore = ReadHighScoreFromFile();
+        }
+
+        public GameState(int previousHighScore)
+        {
+            HighScore = previousHighScore;
+            GameGrid = new GameGrid(22, 10);
+            BlockQueue = new BlockQueue();
+            currentBlock = BlockQueue.GetAndUpdate();
+            CanHold = true;
+           
 
         }
+
+     
 
         private bool BlockFits()
         {
@@ -95,9 +112,6 @@ namespace Tetris
                 CurrentBlock.RotateCCW();
             }
         }
-
-     
-        
         
         public void RotateBlockCCW()
         {
@@ -133,7 +147,6 @@ namespace Tetris
         private bool IsGameOver()
         {
             return !(GameGrid.IsRowEmpty(0) && GameGrid.IsRowEmpty(1));
-
         }
 
         private void PlaceBlock()
@@ -143,18 +156,27 @@ namespace Tetris
                 GameGrid[p.Row, p.Column] = CurrentBlock.Id;
             }
 
-           Score+= GameGrid.ClearFullRows();
+            Score += GameGrid.ClearFullRows();
+
+            if (Score > HighScore)
+            {
+                HighScore = Score;
+                WriteHighScoreToFile(HighScore);
+            }
+         
+
             if (IsGameOver())
             {
                 GameOver = true;
-            }else
+            }
+            else
             {
-
                 CurrentBlock = BlockQueue.GetAndUpdate();
-                CanHold= true; 
+                CanHold = true;
             }
 
         }
+
         public void MoveBlockDown()
         {
             CurrentBlock.Move(1,0);
@@ -172,12 +194,9 @@ namespace Tetris
             while (GameGrid.IsEmpty(p.Row + drop +1, p.Column))
             {
                 drop++;
-
             }
             return drop;
-
         } 
-
 
         public int BlockDropDistance()
         {
@@ -196,8 +215,60 @@ namespace Tetris
         {
             currentBlock.Move(BlockDropDistance(),0);
             PlaceBlock();
+        }
 
+        private int ReadHighScoreFromFile()
+        {
+            String line;
+            int highScore = 0;
+            try
+            {
+                var filePath = Directory.GetCurrentDirectory() + "\\highScore.txt";
+                StreamReader sr = new StreamReader(filePath);
+                line = sr.ReadLine();
 
+                highScore = int.Parse(line);
+
+                sr.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Executing finally block.");
+            }
+
+            return highScore;
+        }
+
+        private bool WriteHighScoreToFile(int highScore)
+        {
+            try
+            {
+                var filePath = Directory.GetCurrentDirectory() + "\\highScore.txt";
+                if(!File.Exists(filePath))
+                {
+                    File.Create(filePath);
+                }
+
+                StreamWriter sw = new StreamWriter(filePath);
+                sw.WriteLine(highScore.ToString());
+                sw.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+                return false;
+            }
+            finally
+            {
+                Console.WriteLine("Executing finally block.");
+            }
+            return true;
         }
     }
+
+
 }

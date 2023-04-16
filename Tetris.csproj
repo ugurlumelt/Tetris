@@ -5,9 +5,14 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>games_tetris_10814.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="musicPlay.png" />
+    <None Remove="musicStop.png" />
+    <None Remove="Mute.png" />
+    <None Remove="Sound.png" />
     <None Remove="TetrisAssets\Background.png" />
     <None Remove="TetrisAssets\Block-Empty.png" />
     <None Remove="TetrisAssets\Block-I.png" />
@@ -30,6 +35,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="games_tetris_10814.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="musicPlay.png" />
+    <Resource Include="musicStop.png" />
+    <Resource Include="Mute.png" />
+    <Resource Include="Sound.png" />
     <Resource Include="TetrisAssets\Background.png" />
     <Resource Include="TetrisAssets\Block-Empty.png" />
     <Resource Include="TetrisAssets\Block-I.png" />
